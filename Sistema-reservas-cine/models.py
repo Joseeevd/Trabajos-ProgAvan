@@ -72,6 +72,7 @@ class Usuario(Persona):
     def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, puntosFidelidad: int):
         super().__init__(idPersona, nombre, email, telefono)
         self.puntosFidelidad = puntosFidelidad
+        self.historialReservas = []
         
     def crearReserva(self):
         print("Reserva creada")
@@ -81,6 +82,22 @@ class Usuario(Persona):
 
     def cancelarReserva(self):
         print("Reserva cancelada")
+        
+class Empleado(Persona):
+    def __init__(self, idPersona, nombre, email, telefono, contrasena, rol, horario):
+        super().__init__(idPersona, nombre, email, telefono, contrasena)
+        self.rol = rol
+        self.horario = horario
+        
+    def marcarEntrada(self, horaEntrada):
+        print("Usted está trabajando")
+
+    def gestionarFunciones(self):
+        if self.rol == "ADMIN":
+            print("Usted puede gestionar las funciones")
+        else:
+            print("Usted no puede gestionar las funciones")
+        
         
         
 class Promocion:
@@ -97,3 +114,31 @@ class Promocion:
     
     def aplicarDescuento(self, monto: float):
         return monto * 0.01 + 100
+    
+    
+    
+class Reserva:
+    
+    def __init__(self, idReserva: int, usuario: Usuario, funcion):
+        self.idReserva = idReserva
+        self.usuario = usuario
+        self.funcion = funcion
+        self.asientos = []
+        self.montoTotal = 0
+        self.estado = "PENDIENTE"
+        
+    def confirmarPago(self):
+        self.montoTotal = len(self.asientos) * self.funcion #numero de asientos * precio por boleto
+        self.estado = "PAGADA"
+        print(f"Total a pagar por {len(self.asientos)} asientos: ${self.montoTotal}")
+        
+    def generarTicket(self):
+        if self.estado == "PAGADA":
+            print(f"---- TICKET DE LA FUNCIÓN {self.idReserva} ----")
+            print(f"Usuario: {self.usuario.nombre}")
+            print(f"Función: {self.funcion}")
+            print(f"Hora: {self.funcion}")
+            print(f"Asientos seleccionados: {self.asientos}")
+            print(f"Monto total: ${self.montoTotal:2f}")
+        else:
+            print("La reserva debe estar pagada para imprimir su ticket.")
