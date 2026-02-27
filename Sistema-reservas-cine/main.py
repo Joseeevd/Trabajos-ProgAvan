@@ -48,5 +48,14 @@ listaPeliculas = [
 #listaEmpleados[2].marcarEntrada()
 #listaEmpleados[3].marcarEntrada()
 
-for p in listaPeliculas:
-    print(p.obtenerSinopsis())
+#for p in listaPeliculas:
+#    print(p.obtenerSinopsis())
+    
+sala1 = Sala(1, "A1", "Adentro", "IMAX", 50, True)
+texto_hora = "26/02/2026 18:30:00"
+
+# Convertir string a objeto datetime
+objeto_hora = datetime.strptime(texto_hora, "%d/%m/%Y %H:%M:%S")
+funcion1 = Funcion(1, listaPeliculas[1], sala1, objeto_hora, 150)
+
+funcion1.obtenerDetallesFuncion()
