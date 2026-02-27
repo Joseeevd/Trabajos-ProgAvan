@@ -141,4 +141,44 @@ class Reserva:
             print(f"Asientos seleccionados: {self.asientos}")
             print(f"Monto total: ${self.montoTotal:2f}")
         else:
-            print("La reserva debe estar pagada para imprimir su ticket.")
+            print("La reserva debe estar pagada para imprimir su ticket.")  
+
+
+# MODULO DE INFRAESTRUCTURA
+class Espacio:
+    def __init__(self, idEspacio: int, nombre: str, ubicacion: str):
+        self.idEspacio = idEspacio
+        self.nombre = nombre
+        self.ubicacion = ubicacion
+        
+    def verificarDisponibilidad(self):
+        print("disponible?")
+
+    def limpiarEspacio():
+        print("Limpiando...")
+
+class Sala(Espacio):
+    def __init__(self, idEspacio, nombre, ubicacion, tipo: str, capacidadTotal: int, esVip: bool):
+        super().__init__(idEspacio, nombre, ubicacion)
+        self.tipo = tipo #2D, 3D, IMAX
+        self.capacidadTotal = capacidadTotal
+        self.esVip = esVip
+    
+    def ajustarAforo(self):
+        print("Aforo ajustado")
+
+    def obtenerTipoSala(self):
+        return self.tipo
+    
+class ZonaComida(Espacio):
+    def __init__(self, idEspacio, nombre, ubicacion, listaProductos: list, stockActual: map[str, int]):
+        super().__init__(idEspacio, nombre, ubicacion)
+        self.listaProductos = listaProductos
+        self.stockActual = stockActual
+        
+    def venderProducto(self, producto):
+        print(f"Se ha vendido el producto {producto}")
+        
+    def actualizarInventario(self, producto, cantidad):
+        print(f"Se ha restado la cantidad de {cantidad} al stock de {producto}")
+        print(f"Stock actual: {self.stockActual}")
