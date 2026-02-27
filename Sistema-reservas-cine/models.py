@@ -1,3 +1,6 @@
+from datetime import datetime
+
+# MÓDULO DE PERSONAS
 class Persona:
     
     def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str):
@@ -86,22 +89,24 @@ class Usuario(Persona):
         print("Reserva cancelada")
         
 class Empleado(Persona):
-    def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str, rol, horario):
+    def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str, rol: str, horario: str):
         super().__init__(idPersona, nombre, email, telefono, contrasena)
-        self.rol = rol
-        self.horario = horario
+        self.rol = rol #TAQUILLERO, ADMIN, LIMPIEZA
         
-    def marcarEntrada(self, horaEntrada):
-        print("Usted está trabajando")
+        # La hora se da en un string de forma "10:00-19-00" (formato de 24hrs, horaEntrada-horaSalida)
+        self.horaEntrada, self.horaSalida = horario.split("-")
+        
+        
+    def marcarEntrada(self):
+        print(f"¡A trabajar, {self.nombre}! son las {self.horaEntrada} y podrás salir a las {self.horaSalida}")
 
     def gestionarFunciones(self):
         if self.rol == "ADMIN":
             print("Usted puede gestionar las funciones")
         else:
             print("Usted no puede gestionar las funciones")
-        
-        
-        
+
+# GESTIÓN COMERCIAL      
 class Promocion:
     
     def __init__(self, codigo: str, descripcion: str, porcentajeDescuento: float, fechaExpiracion: str):
@@ -184,3 +189,45 @@ class ZonaComida(Espacio):
     def actualizarInventario(self, producto, cantidad):
         print(f"Se ha restado la cantidad de {cantidad} al stock de {producto}")
         print(f"Stock actual: {self.stockActual}")
+        
+# LÓGICA DE FUNCIONES Y PELÍCULAS
+class Pelicula:
+    def __init__(self, titulo: str, duracion: int, clasificacion: str, genero: str, sinopsis: str):
+        self.titulo = titulo
+        self.duracion = duracion #Duración en minutos
+        self.clasificacion = clasificacion
+        self.genero = genero # Terror, Romance, Acción, Familiar, Animada
+        self.sinopsis = sinopsis
+        
+    def __str__(self):
+        return f"{self.titulo} ({self.duracion} min) | [{self.clasificacion}] | Género: {self.genero} | Sinopsis: {self.sinopsis}"
+        
+    def obtenerSinopsis(self):
+        return self.sinopsis
+    
+    def esAptaParaTodoPublico(self):
+        if self.genero == "Terror" or self.genero == "Romance":
+            return False
+        
+        return True
+
+class Funcion:
+    def __init__(self, idFuncion: int, pelicula: Pelicula, sala: Sala, horarioInicio: datetime, precioBase: float):
+        self.idFuncion = idFuncion
+        self.pelicula = pelicula
+        self.sala = sala
+        self.horarioInicio = horarioInicio
+        self.precioBase = precioBase
+        
+    def calcularAsientosLibres(self, reserva: Reserva):
+        if self.sala.capacidadTotal >= len(reserva.asientos):
+            print("La sala aún dispone de asientos suficientes para esta operacion")
+        else:
+            print("La sala para está función se encuentra llena")
+            
+    def obtenerDetallesFuncion(self):
+        print(f"---- FUNCIÓN (ID: {self.idFuncion})")
+        print(f"{self.pelicula.titulo} - {self.pelicula.duracion} minutos")
+        print(f"Sala: {self.sala.nombre} ({self.sala.tipo})")
+        print(f"Hora de inicio: {self.horarioInicio}")
+        print(f"Precio base por boleto: ${self.precioBase}")
