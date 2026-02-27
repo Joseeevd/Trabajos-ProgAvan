@@ -1,5 +1,3 @@
-
-
 class Persona:
     
     def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str):
@@ -10,15 +8,18 @@ class Persona:
         self.contrasena = contrasena
         self.logeado = False 
 
-    def login(self, id: str, c: str):
+    def __str__(self):
+        return f"ID persona: {self.idPersona} - Nombre: {self.nombre} - Email: {self.email} - Teléfono: {self.telefono} - Contraseña: {self.contrasena} - Logeado: {self.logeado}"
+
+    def login(self, id: int, c: str):
         if self.idPersona == id and self.contrasena == c:
             print(f"Bienvenido, {self.nombre}")
             self.logeado = True
         else:
-            print(f"El Id de usuario o la contraseña son incorrectos, intente de nuevo")
+            print(f"El ID de usuario o la contraseña son incorrectos, intente de nuevo")
     
     def logout(self):
-        if self.login() == True:
+        if self.logeado == True:
             print("Logout correcto")
             self.logeado = False
         else:
@@ -68,11 +69,12 @@ class Persona:
         
 
 class Usuario(Persona):
-    
-    def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, puntosFidelidad: int):
-        super().__init__(idPersona, nombre, email, telefono)
+    #
+    def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str, puntosFidelidad: int):
+        super().__init__(idPersona, nombre, email, telefono, contrasena)
         self.puntosFidelidad = puntosFidelidad
         self.historialReservas = []
+
         
     def crearReserva(self):
         print("Reserva creada")
@@ -84,7 +86,7 @@ class Usuario(Persona):
         print("Reserva cancelada")
         
 class Empleado(Persona):
-    def __init__(self, idPersona, nombre, email, telefono, contrasena, rol, horario):
+    def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str, rol, horario):
         super().__init__(idPersona, nombre, email, telefono, contrasena)
         self.rol = rol
         self.horario = horario
@@ -171,7 +173,7 @@ class Sala(Espacio):
         return self.tipo
     
 class ZonaComida(Espacio):
-    def __init__(self, idEspacio, nombre, ubicacion, listaProductos: list, stockActual: map[str, int]):
+    def __init__(self, idEspacio, nombre, ubicacion, listaProductos: list, stockActual: map):
         super().__init__(idEspacio, nombre, ubicacion)
         self.listaProductos = listaProductos
         self.stockActual = stockActual
