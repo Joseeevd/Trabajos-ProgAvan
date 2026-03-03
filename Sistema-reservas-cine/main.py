@@ -1,4 +1,5 @@
 from models import *
+from datetime import datetime
 
 listaUsuarios = [
     Usuario(1, "Javier", "javi@gmail.com", "2364748127", "9090", 10),
@@ -50,12 +51,23 @@ listaPeliculas = [
 
 #for p in listaPeliculas:
 #    print(p.obtenerSinopsis())
-    
-sala1 = Sala(1, "A1", "Adentro", "IMAX", 50, True)
-texto_hora = "26/02/2026 18:30:00"
+
+#sala1 = Sala(1, "A1", "Adentro", "IMAX", 50, True)
+#texto_hora = "26/02/2026 18:30:00"
 
 # Convertir string a objeto datetime
-objeto_hora = datetime.strptime(texto_hora, "%d/%m/%Y %H:%M:%S")
-funcion1 = Funcion(1, listaPeliculas[1], sala1, objeto_hora, 150)
+#objeto_hora = datetime.strptime(texto_hora, "%d/%m/%Y %H:%M:%S")
+#funcion1 = Funcion(1, listaPeliculas[1], sala1, objeto_hora, 150)
 
-funcion1.obtenerDetallesFuncion()
+#funcion1.obtenerDetallesFuncion()
+#print(type(Pelicula.cartelera[0]))
+hora1 = datetime(2026, 3, 20, 15, 30)
+sala1 = Sala(1, "Sala 1", "Interior", "IMAX", 20, True)
+funcion1 = Funcion(1, listaPeliculas[9], sala1, hora1, 120.0)
+listaUsuarios[0].crearReserva()
+listaUsuarios[0].historialReservas[0].confirmarPago()
+listaUsuarios[0].historialReservas[0].generarTicket()
+
+listaUsuarios[1].crearReserva()
+listaUsuarios[1].historialReservas[0].confirmarPago()
+listaUsuarios[1].historialReservas[0].generarTicket()

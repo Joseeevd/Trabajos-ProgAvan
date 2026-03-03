@@ -80,7 +80,58 @@ class Usuario(Persona):
 
         
     def crearReserva(self):
-        print("Reserva creada")
+        print("-----------------------------------------------------------")
+        print(f"\nHola, {self.nombre}! Vamos a realizar una reservación.")
+        #Peliculas
+        flag = False
+        Pelicula.imprimirCartelera()
+        nombrePeli = input("Ingrese el título de la película: ")
+        for peli in Pelicula.cartelera:
+            if(peli.titulo == nombrePeli):
+                flag = True
+                #peliculaSeleccionada = peli
+                break
+        if(flag == False):
+            print("[ERROR]: La película no se encontró (Cuidado con las mayúsculas, espacios y tildes.)")
+            return
+        
+        #Asignación de la función
+        flag = False
+        Funcion.imprimirFunciones(nombrePeli)
+        if len(Funcion.funciones) > 0 :
+            idFuncionSelec = int(input("Ingrese el ID de la función que desea ver: "))
+        for f in Funcion.funciones:
+            if(f.idFuncion == idFuncionSelec):
+                flag = True
+                funcionSeleccionada = f
+                break
+        if(flag == False):
+            print("[ERROR]: El ID ingresado no existe.")
+            return  
+        
+                 
+                        
+        #Seleccion de asientos
+        asientos = input("Ingrese los asientos que quiere reservar, separados por comas: ")
+        asientosSolicitados = [asiento.strip() for asiento in asientos.split(',')] #un 'parseo' para que los asientos se vuelvan parte de una lista individual
+        print("[SISTEMA]: Verificando disponibilidad...")
+        flag = False
+        for a in asientosSolicitados:
+            if a in funcionSeleccionada.listaAsientosOcupados:
+                print(f"[ERROR]: El asiento {a} ya se encuentra ocupado, seleccione asientos disponibles.")
+                flag = False
+                return
+        if flag:
+            print(f"'\nTodo correcto! los asientos {asientosSolicitados} han sido bloqueados")
+            
+        montoBase =  funcionSeleccionada.precioBase * len(asientosSolicitados)
+        print(f"Monto base por {len(asientosSolicitados)} asientos: ${montoBase}")
+        
+        # opacandastar! Si llega acá es pq todo está chido, momento de hacer la Reserva
+        reserva = Reserva(Reserva.contadorReservas, self, funcionSeleccionada, asientosSolicitados)
+        Reserva.contadorReservas += 1 # Aumentamos el 'id' global de reservas
+        self.historialReservas.append(reserva)
+        print("Su reserva ha sido guardada correctamente!")
         
     def consultarPromociones(self):
         print("nohay")
@@ -125,26 +176,27 @@ class Promocion:
     
     
 class Reserva:
+    contadorReservas = 1    
     
-    def __init__(self, idReserva: int, usuario: Usuario, funcion):
+    def __init__(self, idReserva: int, usuario: Usuario, funcion, asientos: list):
         self.idReserva = idReserva
         self.usuario = usuario
         self.funcion = funcion
-        self.asientos = []
+        self.asientos = asientos
         self.montoTotal = 0
         self.estado = "PENDIENTE"
         
     def confirmarPago(self):
-        self.montoTotal = len(self.asientos) * self.funcion #numero de asientos * precio por boleto
+        self.montoTotal = len(self.asientos) * self.funcion.precioBase  #numero de asientos * precio por boleto
         self.estado = "PAGADA"
         print(f"Total a pagar por {len(self.asientos)} asientos: ${self.montoTotal}")
         
     def generarTicket(self):
         if self.estado == "PAGADA":
-            print(f"---- TICKET DE LA FUNCIÓN {self.idReserva} ----")
+            print(f"\n\n---- TICKET DE LA FUNCIÓN {self.idReserva} ----")
             print(f"Usuario: {self.usuario.nombre}")
-            print(f"Función: {self.funcion}")
-            print(f"Hora: {self.funcion}")
+            print(f"Función: {self.funcion.idFuncion}")
+            print(f"Hora: {self.funcion.horarioInicio}")
             print(f"Asientos seleccionados: {self.asientos}")
             print(f"Monto total: ${self.montoTotal:2f}")
         else:
@@ -192,12 +244,16 @@ class ZonaComida(Espacio):
         
 # LÓGICA DE FUNCIONES Y PELÍCULAS
 class Pelicula:
+    cartelera = []
+    
     def __init__(self, titulo: str, duracion: int, clasificacion: str, genero: str, sinopsis: str):
         self.titulo = titulo
         self.duracion = duracion #Duración en minutos
         self.clasificacion = clasificacion
         self.genero = genero # Terror, Romance, Acción, Familiar, Animada
         self.sinopsis = sinopsis
+        
+        self.cartelera.append(self)
         
     def __str__(self):
         return f"{self.titulo} ({self.duracion} min) | [{self.clasificacion}] | Género: {self.genero} | Sinopsis: {self.sinopsis}"
@@ -206,18 +262,32 @@ class Pelicula:
         return self.sinopsis
     
     def esAptaParaTodoPublico(self):
-        if self.genero == "Terror" or self.genero == "Romance":
+        if self.clasificacion == "R" or self.clasificacion == "PG-13":
             return False
         
         return True
+    
+    @classmethod
+    def imprimirCartelera(self):
+        print("\n---- CARTELERA ACTUAL ----")
+        for p in self.cartelera:
+            print(f"{p.titulo} ({p.duracion} min) | [{p.clasificacion}]")
 
 class Funcion:
+    funciones = []
+    
     def __init__(self, idFuncion: int, pelicula: Pelicula, sala: Sala, horarioInicio: datetime, precioBase: float):
         self.idFuncion = idFuncion
         self.pelicula = pelicula
         self.sala = sala
         self.horarioInicio = horarioInicio
         self.precioBase = precioBase
+        self.listaAsientosOcupados = []
+        
+        self.funciones.append(self)
+        
+    def __str__(self):
+        return f"ID: {self.idFuncion}, Película: {self.pelicula.titulo}, Sala: {self.sala.nombre} ({self.sala.tipo}, Hora:{self.horarioInicio}, Precio: ${self.precioBase})"
         
     def calcularAsientosLibres(self, reserva: Reserva):
         if self.sala.capacidadTotal >= len(reserva.asientos):
@@ -231,3 +301,13 @@ class Funcion:
         print(f"Sala: {self.sala.nombre} ({self.sala.tipo})")
         print(f"Hora de inicio: {self.horarioInicio}")
         print(f"Precio base por boleto: ${self.precioBase}")
+    
+    @classmethod   
+    def imprimirFunciones(self, tituloAFiltrar: str):
+        print("\n---- FUNCIONES ----")
+        if(self.funciones):
+            for funcion in self.funciones:
+                if funcion.pelicula.titulo == tituloAFiltrar:
+                    print(funcion)
+        else:
+            print(f"No hay funciones existentes para la película de {tituloAFiltrar}")
