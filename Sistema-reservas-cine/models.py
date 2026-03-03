@@ -81,57 +81,65 @@ class Usuario(Persona):
         
     def crearReserva(self):
         print("-----------------------------------------------------------")
-        print(f"\nHola, {self.nombre}! Vamos a realizar una reservación.")
+        print(f"\nUsuario: {self.nombre} (Puntos: {self.puntosFidelidad})")
         #Peliculas
-        flag = False
-        Pelicula.imprimirCartelera()
-        nombrePeli = input("Ingrese el título de la película: ")
-        for peli in Pelicula.cartelera:
-            if(peli.titulo == nombrePeli):
-                flag = True
-                #peliculaSeleccionada = peli
+        while(True):
+            flag = False
+            Pelicula.imprimirCartelera()
+            nombrePeli = input("Ingrese el título de la película: ")
+            for peli in Pelicula.cartelera:
+                if(peli.titulo == nombrePeli):
+                    flag = True
+                    #peliculaSeleccionada = peli
+                    break
+            if(flag == False):
+                print("[ERROR]: La película no se encontró (Cuidado con las mayúsculas, espacios y tildes.)")
+            else:
                 break
-        if(flag == False):
-            print("[ERROR]: La película no se encontró (Cuidado con las mayúsculas, espacios y tildes.)")
-            return
         
         #Asignación de la función
-        flag = False
-        Funcion.imprimirFunciones(nombrePeli)
-        if len(Funcion.funciones) > 0 :
-            idFuncionSelec = int(input("Ingrese el ID de la función que desea ver: "))
-        for f in Funcion.funciones:
-            if(f.idFuncion == idFuncionSelec):
-                flag = True
-                funcionSeleccionada = f
+        while(True):
+            flag = False
+            Funcion.imprimirFunciones(nombrePeli)
+            if len(Funcion.funciones) > 0 :
+                idFuncionSelec = int(input("Ingrese el ID de la función que desea ver: "))
+            else:
+                print("No hay funciones para esta película")
+                return
+            
+            
+            # iteramos en nuestra 'cartelera' de funciones y vemos cuales existen para la película seleccioanda
+            for f in Funcion.funciones:
+                if(f.idFuncion == idFuncionSelec):
+                    flag = True
+                    funcionSeleccionada = f
+            
+            if(flag == True):
                 break
-        if(flag == False):
-            print("[ERROR]: El ID ingresado no existe.")
-            return  
+            else:
+                print("[ERROR]: El ID ingresado no existe.")  
         
                  
                         
         #Seleccion de asientos
-        asientos = input("Ingrese los asientos que quiere reservar, separados por comas: ")
-        asientosSolicitados = [asiento.strip() for asiento in asientos.split(',')] #un 'parseo' para que los asientos se vuelvan parte de una lista individual
-        print("[SISTEMA]: Verificando disponibilidad...")
-        flag = False
-        for a in asientosSolicitados:
-            if a in funcionSeleccionada.listaAsientosOcupados:
-                print(f"[ERROR]: El asiento {a} ya se encuentra ocupado, seleccione asientos disponibles.")
-                flag = False
-                return
-        if flag:
-            print(f"'\nTodo correcto! los asientos {asientosSolicitados} han sido bloqueados")
+        while(True):
+            asientos = input("\nIngrese los asientos que quiere reservar, separados por comas: ")
+            asientosSolicitados = [asiento.strip() for asiento in asientos.split(',')] #un 'parseo' para que los asientos se vuelvan parte de una lista individual
+            print("[SISTEMA]: Verificando disponibilidad...")
             
-        montoBase =  funcionSeleccionada.precioBase * len(asientosSolicitados)
-        print(f"Monto base por {len(asientosSolicitados)} asientos: ${montoBase}")
-        
-        # opacandastar! Si llega acá es pq todo está chido, momento de hacer la Reserva
-        reserva = Reserva(Reserva.contadorReservas, self, funcionSeleccionada, asientosSolicitados)
-        Reserva.contadorReservas += 1 # Aumentamos el 'id' global de reservas
-        self.historialReservas.append(reserva)
-        print("Su reserva ha sido guardada correctamente!")
+            resultadoAsignacion = funcionSeleccionada.calcularAsientosLibres(asientosSolicitados)
+
+            if resultadoAsignacion:  
+                montoBase =  funcionSeleccionada.precioBase * len(asientosSolicitados)
+                print(f"Monto base por {len(asientosSolicitados)} asientos: ${montoBase}")
+                
+                # opacandastar! Si llega acá es pq todo está chido, momento de hacer la Reserva
+                reserva = Reserva(Reserva.contadorReservas, self, funcionSeleccionada, asientosSolicitados)
+                Reserva.contadorReservas += 1 # Aumentamos el 'id' global de reservas
+                self.historialReservas.append(reserva)
+                print("Su reserva ha sido guardada correctamente!")
+                
+                break #chau while
         
     def consultarPromociones(self):
         print("nohay")
@@ -289,11 +297,18 @@ class Funcion:
     def __str__(self):
         return f"ID: {self.idFuncion}, Película: {self.pelicula.titulo}, Sala: {self.sala.nombre} ({self.sala.tipo}, Hora:{self.horarioInicio}, Precio: ${self.precioBase})"
         
-    def calcularAsientosLibres(self, reserva: Reserva):
-        if self.sala.capacidadTotal >= len(reserva.asientos):
-            print("La sala aún dispone de asientos suficientes para esta operacion")
-        else:
-            print("La sala para está función se encuentra llena")
+    def calcularAsientosLibres(self, asientosSolicitados: list) -> bool:
+        flag = True
+        for a in asientosSolicitados:
+            if a in self.listaAsientosOcupados:
+                print(f"[ERROR]: El asiento {a} ya se encuentra ocupado, seleccione asientos disponibles.")
+                flag = False
+                return False
+        if flag:
+            for asien in asientosSolicitados: self.listaAsientosOcupados.append(asien) #Metemos los asientos a la lista de la función seleccionada si todo está correcto
+            print(self.listaAsientosOcupados)
+            print(f"'\nTodo correcto! los asientos {asientosSolicitados} han sido bloqueados")
+            return True
             
     def obtenerDetallesFuncion(self):
         print(f"---- FUNCIÓN (ID: {self.idFuncion})")
