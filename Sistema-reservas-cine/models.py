@@ -78,6 +78,12 @@ class Usuario(Persona):
         self.puntosFidelidad = puntosFidelidad
         self.historialReservas = []
 
+    def imprimirHistorialReservas(self):
+        if len(self.historialReservas) == 0:
+            print("\nNo hay reservas registradas en su cuenta.")
+        else:
+            for r in self.historialReservas:
+                print(r)
         
     def crearReserva(self):
         print("-----------------------------------------------------------")
@@ -144,8 +150,9 @@ class Usuario(Persona):
     def consultarPromociones(self):
         print("nohay")
 
-    def cancelarReserva(self):
-        print("Reserva cancelada")
+    def cancelarReserva(self, reserva):
+        reserva.estado = "CANCELADA"
+        print(f"La reserva con ID {reserva.idReserva} fue cancelada exitosamente")
         
 class Empleado(Persona):
     def __init__(self, idPersona: int, nombre: str, email: str, telefono: str, contrasena: str, rol: str, horario: str):
@@ -168,11 +175,14 @@ class Empleado(Persona):
 # GESTIÓN COMERCIAL      
 class Promocion:
     
-    def __init__(self, codigo: str, descripcion: str, porcentajeDescuento: float, fechaExpiracion: str):
+    def __init__(self, codigo: str, descripcion: str, porcentajeDescuento: float, fechaExpiracion: datetime):
             self.codigo = codigo
             self.descripcion = descripcion
             self.porcentajeDescuento = porcentajeDescuento
             self.fechaExpiracion = fechaExpiracion
+    
+    def __str__(self):
+        return f"Código: {self.codigo}, Descripción: {self.descripcion}, Porcentaje de descuento: {(self.porcentajeDescuento)}%, Fecha de expiración: {self.fechaExpiracion}"
     
     def esValida(self):
         print("Puede ser")
@@ -194,6 +204,9 @@ class Reserva:
         self.montoTotal = 0
         self.estado = "PENDIENTE"
         
+    def __str__(self):
+        return f"ID reserva: {self.idReserva}, Función: {self.funcion.pelicula.titulo}, Estado: {self.estado}"
+    
     def confirmarPago(self):
         self.montoTotal = len(self.asientos) * self.funcion.precioBase  #numero de asientos * precio por boleto
         self.estado = "PAGADA"
