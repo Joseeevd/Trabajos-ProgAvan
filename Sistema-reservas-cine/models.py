@@ -243,6 +243,9 @@ class Sala(Espacio):
         self.tipo = tipo #2D, 3D, IMAX
         self.capacidadTotal = capacidadTotal
         self.esVip = esVip
+        
+    def __str__(self):
+        return f"ID: {self.idEspacio}, Nombre: {self.nombre}, Tipo: {self.tipo}, Capacidad: {self.capacidadTotal}, VIP: {self.esVip}"
     
     def ajustarAforo(self):
         print("Aforo ajustado")
