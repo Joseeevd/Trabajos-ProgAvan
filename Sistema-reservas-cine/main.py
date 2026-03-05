@@ -2,7 +2,7 @@ from models import *
 from datetime import datetime
 
 #Valores varios para las operaciones
-idFuncionActual = 7 #Para aumentar los ID constantemente
+idFuncionActual = 11 #Para aumentar los ID constantemente
 year = 2026
 
 print("INSTANCIACIÓN E IMPRESIÓN DE 10 ELEMENTOS DE CADA CLASE")
@@ -102,10 +102,59 @@ listaPromos = [
 ]
 for p in listaPromos:
     print(p)
+    
+print("\nReservas: ")
+listaReservas = [
+    Reserva(1, listaUsuarios[0], listaFunciones[0], ["A1", "A2"]),
+    Reserva(2, listaUsuarios[1], listaFunciones[1], ["B6", "C6"]),
+    Reserva(3, listaUsuarios[2], listaFunciones[2], ["A11", "A12"]),
+    Reserva(4, listaUsuarios[3], listaFunciones[3], ["F10", "F9"]),
+    Reserva(5, listaUsuarios[4], listaFunciones[4], ["H11", "H12", "H13", "H14"]),
+    Reserva(6, listaUsuarios[5], listaFunciones[5], ["E5", "E7"]),
+    Reserva(7, listaUsuarios[6], listaFunciones[6], ["A1", "A2", "A3"]),
+    Reserva(8, listaUsuarios[7], listaFunciones[7], ["J6", "J7", "J8"]),
+    Reserva(9, listaUsuarios[8], listaFunciones[8], ["G9"]),
+    Reserva(10, listaUsuarios[9], listaFunciones[9], ["I10", "I11"]),
+]
 
+for r in listaReservas:
+    print(r)
 
 print("\n\n\nPROBANDO FUNCIONALIDAD DE DISTINTOS MÉTODOS DE CADA CLASE")
 
+listaEmpleados[1].marcarEntrada()
+listaEmpleados[2].marcarEntrada()
+
+listaEmpleados[1].gestionarFunciones() # eS ADMIN, si puede
+listaEmpleados[2].gestionarFunciones() # no puede, no es ADMIN
+
+print(listaPromos[0].esValida()) # Aún es válida -> True
+print(listaPromos[6].esValida()) # No, caducó el 14 -> False
+
+print(f"Total a pagar: {listaPromos[1].aplicarDescuento(150.0)}") # Codigo BUAPOS (50%), metemos $150 y nos cobraría $75
+
+listaReservas[3].confirmarPago()
+listaReservas[6].confirmarPago()
+
+listaReservas[3].generarTicket()
+listaReservas[6].generarTicket()
+
+listaSalas[0].ajustarAforo()
+
+print(listaSalas[0].obtenerTipoSala())
+print(listaSalas[4].obtenerTipoSala())
+
+print(listaPeliculas[3].obtenerSinopsis())
+
+print(listaPeliculas[0].esAptaParaTodoPublico()) # R -> False
+print(listaPeliculas[4].esAptaParaTodoPublico()) # G -> True
+
+Pelicula.imprimirCartelera()
+
+listaFunciones[3].obtenerDetallesFuncion()
+listaFunciones[9].obtenerDetallesFuncion()
+
+Funcion.imprimirFunciones("El Conjuro")
 
 print("\n\n\n\nEJECUCIÓN DE RETOS")
 
@@ -152,6 +201,12 @@ while(True):
                         case 3:
                             personaLogeada.imprimirHistorialReservas()
                             idcancelar = int(input("\nIngrese el ID de la reserva a cancelar"))
+                            for res  in personaLogeada.historialReservas:
+                                if idcancelar == res.idReserva:
+                                    resCancelada = res
+                                    
+                            personaLogeada.cancelarReserva(resCancelada)
+                            print(f"Estado: {resCancelada.estado}")
                             
                 restart2 = int(input(f"¿Desea consultar algo más, {personaLogeada.nombre}? (1. SI, 2. NO): "))
                 if(restart2 != 1): break 
