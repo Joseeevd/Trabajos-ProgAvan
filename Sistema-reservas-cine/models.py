@@ -185,11 +185,11 @@ class Promocion:
         return f"Código: {self.codigo}, Descripción: {self.descripcion}, Porcentaje de descuento: {(self.porcentajeDescuento)}%, Fecha de expiración: {self.fechaExpiracion}"
     
     def esValida(self):
-        print("Puede ser")
-        return True
+        fechaActual = datetime(2026, 3, 4, 0, 0)
+        return fechaActual < self.fechaExpiracion
     
     def aplicarDescuento(self, monto: float):
-        return monto * 0.01 + 100
+        return monto - (monto * (self.porcentajeDescuento/100))
     
     
     
@@ -322,7 +322,7 @@ class Funcion:
                 return False
         if flag:
             for asien in asientosSolicitados: self.listaAsientosOcupados.append(asien) #Metemos los asientos a la lista de la función seleccionada si todo está correcto
-            print(self.listaAsientosOcupados)
+            #print(self.listaAsientosOcupados)
             print(f"'\nTodo correcto! los asientos {asientosSolicitados} han sido bloqueados")
             return True
             
