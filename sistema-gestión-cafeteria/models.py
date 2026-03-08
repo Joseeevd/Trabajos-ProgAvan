@@ -1,9 +1,30 @@
+from enum import Enum
+
+
+# Enums para las cosas que existen (Esta vez si lo implementé)
+class Rol(Enum):
+    BARISTA  = "Barista"
+    MESERO   = "Mesero"
+    GERENTE  = "Gerente"
+
+class Temperatura(Enum):
+    FRIA     = "Fría"
+    CALIENTE = "Caliente"
+
+class EstadoPedido(Enum):
+    PENDIENTE   = "Pendiente"
+    PREPARANDO  = "Preparando"
+    ENTREGADO   = "Entregado"
 
 # Módulo de personas
 class Persona:
+    # Nota -> Los ID tanto de clientes como de personas ahora seran variables 'autoincrementables' y privadas para evitar repeticion en el sistema
+    _contadorId = 1
     
-    def __init__(self, idPersona: int, nombre: str, email: str):
-        self.idPersona = idPersona
+    def __init__(self, nombre: str, email: str):
+        self.idPersona = Persona._contadorId
+        Persona._contadorId += 1 # Aumentamos en 1 
+        
         self.nombre = nombre
         self.email = email
         
@@ -15,11 +36,14 @@ class Persona:
 
 
 class Cliente(Persona):
-    def __init__(self, idPersona: int, nombre: str, email: str, puntosFidelidad: int):
-        super().__init__(idPersona, nombre, email)
+    def __init__(self,nombre: str, email: str, puntosFidelidad: int):
+        super().__init__(nombre, email)
         self.puntosFidelidad = puntosFidelidad
         self.historialPedidos = []
-        
+    
+    def __str__(self):
+        return super().__str__()
+    
     def realizarPedido(self):
         print("Pidiendo...")
         
@@ -34,8 +58,8 @@ class Cliente(Persona):
         print(f"Usted tiene {self.puntosFidelidad} puntos acumulados")
         
 class Empleado(Persona):
-    def __init__(self, idPersona: int, nombre: str, email: str, rol: str):
-        super().__init__(idPersona, nombre, email)
+    def __init__(self,  nombre: str, email: str, rol: Rol):
+        super().__init__(nombre, email)
         self.rol = rol # BARISTA, MESERO, GERENTE
         
     def actualizarInventario(self):
@@ -56,7 +80,7 @@ class ProductoBase:
 
 class Bebida(ProductoBase):
     
-    def __init__(self, idProducto: int, nombre: str, precioBase: float, tamano: str, temperatura: str, modificadores: list):
+    def __init__(self, idProducto: int, nombre: str, precioBase: float, tamano: str, temperatura: Temperatura, modificadores: list):
         super().__init__(idProducto, nombre, precioBase)
         self.tamano = tamano
         self.temperatura = temperatura
@@ -75,6 +99,9 @@ class Postre(ProductoBase):
         super().__init__(idProducto, nombre, precioBase)
         self.esVegano = esVegano
         self.sinGluten - sinGluten
+        
+    def __str__(self):
+        return f"ID: {self.idProducto}, Nombre: {self.nombre}, Precio base: ${self.precioBase}, Es vegano: {self.esVegano}, Sin gluten: {self.sinGluten}"
 
 
 # Log[i]stica y ventas
