@@ -43,7 +43,7 @@ class Cliente(Persona):
         self.historialPedidos = []
     
     def __str__(self):
-        return super().__str__()
+        return f"ID: {self.idPersona} - {self.nombre} ({self.puntosFidelidad} pts.), email:{self.email}"
     
     # Se agrega el pedido al historial
     def realizarPedido(self, pedido: Pedido):
@@ -128,8 +128,8 @@ class Bebida(ProductoBase):
     
 class Postre(ProductoBase):
     
-    def __init__(self, nombre: str, precioBase: float, esVegano: bool, sinGluten: bool):
-        super().__init__(nombre, precioBase)
+    def __init__(self, nombre: str, precioBase: float, esVegano: bool, sinGluten: bool, ingredientes: list[str]):
+        super().__init__(nombre, precioBase, ingredientes)
         self.esVegano = esVegano
         self.sinGluten - sinGluten
         
@@ -184,17 +184,28 @@ class Inventario:
     def __init__(self, ingredientes: dict[str, int]):
         self.ingredientes = ingredientes
         
-    def reducirStock(self, cantidad):
-        print(f"Se ha reducido {cantidad} al stock de ///")
+    def reducirStock(self, ingrediente: str, cantidad: int) ->bool:
+        stockIngrediente = self.ingredientes.get(ingrediente, 0)
+        if stockIngrediente < cantidad:
+            print(f"El stock actual de {ingrediente} ({stockIngrediente}) no es suficiente para satisfacer esta acción")
+            return False
+        else:
+            print(f"Se ha reducido {cantidad} al stock de ///")
+            return True
         
-    def notificarFaltante(self, ingrediente):
-        print(f"Se ha establecido el estado de {ingrediente} como faltante")
+    def notificarFaltante(self, ingrediente: str):
+        stockIngrediente = self.ingredientes.get(ingrediente, 0)
+        
+        # Si hay menos de 5 unidades por ingrediente notificamos faltante
+        if stockIngrediente <= 5:
+            print(f"\n[ALERTA]: El stock de {ingrediente} es bajo ({stockIngrediente} unidades).")
     
     
     def mostrarInventario(self):
         print("\nINVENTARIO:")
         if self.ingredientes:
             for ing, cantidad in self.ingredientes.items():
-                print(f"Ingrediente: {ing}, cantidad: {cantidad}")
+                print(f"{ing} ---> cantidad: {cantidad}")
+                self.notificarFaltante(ing) #Para que cada vez imprimimos el inventario mande alerta si es necesario
         else:
             print("No hay ingredientes registrados")

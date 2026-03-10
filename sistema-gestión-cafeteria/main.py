@@ -1,7 +1,7 @@
 from models import * 
 
 listaClientes = [
-    Cliente("Juan Pérez", "juan.perez@email.com", "pass1234", 150),
+    Cliente("Jose el cliente", "jose@email.com", "1234", 150),
     Cliente("María García", "m.garcia88@email.com", "segura_99", 420),
     Cliente("Carlos López", "clopez_dev@email.com", "carlos*2024", 10),
     Cliente("Ana Martínez", "ana.mtz@email.com", "flower88", 850),
@@ -13,10 +13,8 @@ listaClientes = [
     Cliente("Sofía Castro", "sofia.castro@email.com", "sofi_vip", 2100)
 ]
 
-
-
 listaEmpleados = [
-    Empleado("Pedro Martínez", "pedro.martinez@cafe.com", "GerenT3#24", Rol.GERENTE),
+    Empleado("Jose el gerente", "jose@cafe.com", "1234", Rol.GERENTE),
     Empleado("Ana García", "ana.garcia@cafe.com", "AnaB@rista", Rol.BARISTA),
     Empleado("Juan López", "juan.lopez@cafe.com", "JuanB23_", Rol.BARISTA),
     Empleado("María Rodríguez", "maria.rodriguez@cafe.com", "M@riaB_99", Rol.BARISTA),
@@ -41,14 +39,60 @@ listaPedidos = [
     Pedido(listaClientes[9]),
 ]
 
+
+listaBebidas = [
+    Bebida("Americano", 35.0, "Mediano", Temperatura.CALIENTE, ["Café"]),
+    Bebida("Latte", 50.0, "Mediano", Temperatura.CALIENTE, ["Café", "Leche"]),
+    Bebida("Latte Vainilla", 60.0, "Mediano", Temperatura.CALIENTE, ["Café", "Leche", "Vainilla"]),
+    Bebida("Flat White", 55.0, "Mediano", Temperatura.CALIENTE, ["Café", "Leche"]),
+    Bebida("Caramel Macchiato", 75.0, "Grande", Temperatura.CALIENTE, ["Café", "Leche", "Caramelo"]),
+    Bebida("Frappé Moka", 85, "Grande", Temperatura.FRIA, ["Café", "Leche", "Chocolate líquido", "Hielo"]),
+    Bebida("Frappé Capuchino", 80, "Grande", Temperatura.FRIA, ["Café", "Leche", "Hielo"]),
+    Bebida("Frappé Caramelo", 85, "Grande", Temperatura.FRIA, ["Café", "Leche", "Hielo", "Caramelo"]),
+    Bebida("Malteada de Fresa", 75, "Mediano", Temperatura.FRIA, ["Leche", "Helado Fresa"]),
+    Bebida("Malteada de Chocolate", 75, "Mediano", Temperatura.FRIA, ["Leche", "Helado Chocolate"])
+]
+
+listaPostres = [
+    Postre("Pastel de Chocolate Clásico", 150.0, False, False, ["Harina", "Huevo", "Azúcar", "Chocolate líquido"]),
+    Postre("Galletas de Mantequilla", 45.0, False, False, ["Galletas", "Mantequilla"]),
+    Postre("Flan de Vainilla", 35.0, False, True, ["Leche", "Huevo", "Azúcar", "Vainilla"]),
+    Postre("Pay de Queso Individual", 60.0, False, False, ["Galletas", "Mantequilla", "Azúcar"]), 
+    Postre("Copa Helado Chocolate & Caramelo", 55.0, False, True, ["Helado Chocolate", "Caramelo"]),
+    Postre("Affogato", 65.0, False, True, ["Helado vainilla", "Café"]),
+    Postre("Bizcocho Vainilla-Fresa", 40.0, False, False, ["Harina", "Huevo", "Vainilla"]),  
+    Postre("Plato de galletas (10 unidades)", 45.0, False, False, ["Galletas"]), 
+    Postre("Crepas con Chocolate Líquido", 50.0, False, False, ["Harina", "Leche", "Chocolate líquido"]),
+    Postre("Dulce de Leche Artesanal (Frasco)", 120.0, False, True, ["Leche", "Azúcar", "Vainilla"])
+]
+# En lugar de hacer 10 inventarios, metemos 10 elementos a un solo inventario (Para mantener la coherencia)
+inventarioCafeteria = Inventario({
+    "Leche" : 100,
+    "Hielo" : 100,
+    "Caramelo" : 70,
+    "Harina" : 20,
+    "Huevo" : 20,
+    "Azúcar" : 20,
+    "Café" : 100,
+    "Vainilla" : 18,
+    "Helado Chocolate": 4,
+    "Helado Fresa": 10,
+    "Helado Vainilla": 10,
+    "Chocolate líquido": 20,
+    "Galletas": 100,
+    "Mantequilla": 20
+})
+
 # Esta ocasion usaremos diccionarios para hacer un listado donde NO SE PUEDAN REPETIR LOS EMAILS que se ingresen.
 dictEmpleados = {}
 dictClientes = {}
+
+#metemos a los clientes y los empleados en sus diccionarios haciendo pares de "email" : Persona (objeto correspondiente)
 for c in listaClientes:
     dictClientes[c.email] = c
     
 for e in listaEmpleados:
-    dictEmpleados[e.email] = c
+    dictEmpleados[e.email] = e
 
 # Funcion para solicitar (con sus debidas validaciones) valores ENTEROSS entre ciertos rangos, se repite hasta que el usuario meta un dato v[a]lido
 def pedirInt(mensaje: str, valorMinimo: int=0, valorMaximo: int = 9999) -> int:
@@ -62,12 +106,47 @@ def pedirInt(mensaje: str, valorMinimo: int=0, valorMaximo: int = 9999) -> int:
             print("Por favor, ingrese un número válido.")
 
 # Una funcion a la que le metes una lista y muy convenientemente te hace el menu de opciones que genial
-def pedirOpcion(opciones: list[str]):
+def pedirOpcion(opciones: list[str]) -> int:
     
     for i, op in enumerate(opciones, 1):
         print(f"{i}. {op}")
         
-    return pedirInt("Elija una opción: ", 1, len(opciones)) # DAmos a eleGIR entre 1 y el numero de ocpiones que existan
+    return pedirInt("Elija una opción", 1, len(opciones)) # DAmos a eleGIR entre 1 y el numero de ocpiones que existan
+
+# Funciones de clientes
+def registrarseComoCliente():
+    print("\n\nBienvenido a nuestra cafetería! \n A continuación, proporcione los siguientes datos para crearle una cuenta: ")
+    
+    nombre = input("Nombre:")
+    
+    while(True):
+        mail = input("Email: ")
+        if mail in dictClientes or mail in dictEmpleados:
+            print("Este email ya se encuentra registrado, proporcione uno válido.")
+        else:
+            break
+    
+    contra = input("Contraseña: ")
+    
+    nuevoCliente = Cliente(nombre, mail, contra, 0)
+    listaClientes.append(nuevoCliente) # Lo metemos al listado global
+    dictClientes[mail] = nuevoCliente #Para poder iniciar sesión
+    print("\nUsted se ha registrado correctamente! Inicie sesión para realizar un pedido.")
+
+def realizarPedido(client: Cliente):
+    #Primero lo primero, crear un pedido a nombre de la persona
+    pedido = Pedido(client)
+    
+    
+def verPedidosRealizados(cliente: Cliente):
+    print(f"---- Pedidos realizados de {cliente.nombre} ----")
+    if cliente.historialPedidos:
+        for pedido in cliente.historialPedidos:
+            print(pedido.imprimirPedido())
+    else:
+        print("No tienes pedidos registrados.")
+
+# Funciones de empleados
 
 def verPedidos():
     print("---- Pedidos registrados ----")
@@ -77,12 +156,49 @@ def verPedidos():
     else:
         print("No hay pedidos registrados")
 
+def cambiarEstadoPedidos():
+    verPedidos()
+    numPedido = pedirInt("Seleccione un pedido para cambiar el estado", 1, len(listaPedidos))
+    
+    numEstadoSeleccionado = pedirOpcion([EstadoPedido.PENDIENTE.value, EstadoPedido.PREPARANDO.value, EstadoPedido.ENTREGADO.value])
+    
+    if numEstadoSeleccionado == 1: estadoSeleccionado = EstadoPedido.PENDIENTE
+    if numEstadoSeleccionado == 2: estadoSeleccionado = EstadoPedido.PREPARANDO
+    if numEstadoSeleccionado == 3: estadoSeleccionado = EstadoPedido.ENTREGADO
+    
+    listaPedidos[numPedido-1].estado = estadoSeleccionado
+
+def actualizarInventario():
+    
+    # Metemos a una lista los ingredientes actuales (Principalmente para usar la función de pedirOpcion, que ocupa una lista de strings como argumento)
+    listaIngredientes = []
+    for ing in inventarioCafeteria.ingredientes:
+        listaIngredientes.append(ing)
+    
+    #Se pide el número del ingrediente 
+    numIng = pedirOpcion(listaIngredientes)
+
+    #Pedimos una cantidad entera positiva    
+    cantidad = pedirInt("Ingrese la cantidad a ingresar", 1, 500)
+    
+    #Buscamos el elemento dentro del listado de ingredientes y le agregamos la cantidad deseada
+    inventarioCafeteria.ingredientes[listaIngredientes[numIng-1]] += cantidad
+    print(f"\nSe ha agregado la cantidad de {cantidad} al stock de {listaIngredientes[numIng-1]} correctamente! \n")
+
+def verClientesRegistrados():
+    print("----- Clientes Registrados ----")
+    for cliente in listaClientes:
+        print(cliente)
+
 def login():
+    usuario = None
     print("---- INICIO DE SESIÓN ----")
     email = input("Ingrese su email: ")
     contra = input("Ingrese su contraseña: ")
 
-    usuario = dictClientes.get(email) or dictEmpleados.get(email) # Vemos si existe el email ingresado en cualquiera de los 2 diccionarios
+     # Vemos si existe el email ingresado en cualquiera de los 2 diccionarios
+    usuario = dictClientes.get(email) or dictEmpleados.get(email)
+    
     if not usuario:
         print("El usuario no se encontró.")
         return
@@ -91,6 +207,7 @@ def login():
         return
     
     #SI todo sale bien
+        
     print(f"Bienvenid@, {usuario.nombre}.")
     usuarioActual = usuario
     
@@ -114,6 +231,8 @@ def mostrarMenuCliente(cliente: Cliente):
         ])
         
         match op:
+            case 1: realizarPedido()
+            case 2: verPedidosRealizados(cliente)
             case _:
                 break
 
@@ -132,23 +251,29 @@ def mostrarMenuEmpleado(empleado: Empleado):
         
         match op:
             case 1: verPedidos()
-            case 3: Inventario.mostrarInventario()
+            case 2: cambiarEstadoPedidos()
+            case 3: inventarioCafeteria.mostrarInventario()
+            case 4: actualizarInventario()
+            case 5: verClientesRegistrados()
             case _:
                 break
 
 
 # Código principal
-
 print("SISTEMA DE GESTION DE CAFETERIAS")
 while True:
+    print("\n----------------------------------------------")
     op = pedirOpcion([
         "Iniciar sesion",
         "Registrarse como cliente",
         "Salir del programa"
     ])
+    print("\n----------------------------------------------")
     match op:
         case 1:
             login()
+        case 2:
+            registrarseComoCliente()
         case _:
             print("Saliendo del programa...")
             break
