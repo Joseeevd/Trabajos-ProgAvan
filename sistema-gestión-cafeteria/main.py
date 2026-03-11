@@ -133,10 +133,71 @@ def registrarseComoCliente():
     dictClientes[mail] = nuevoCliente #Para poder iniciar sesión
     print("\nUsted se ha registrado correctamente! Inicie sesión para realizar un pedido.")
 
+def pedirExtras(bebida: Bebida):
+    print("\nExtras de la bebida: \n")
+    listaExtras = []
+    listaExtras.append("Ningún extra + $0")
+    extras = list(Bebida.precioExtras.keys())
+    for ex in Bebida.precioExtras:
+        text = f"{ex} + ${Bebida.precioExtras.get(ex, 0):.2f}"
+        listaExtras.append(text)
+        
+    numExtra = pedirOpcion(listaExtras)
+    if numExtra > 1: 
+        bebida.agregarExtra(extras[numExtra-2])
+    
+    return bebida
+
 def realizarPedido(client: Cliente):
+    print("\n\n---- REALIZANDO PEDIDO ----")
+    
+    # Una lista para operar sobre todo
+    menuDeLaCafe = listaBebidas + listaPostres
+    listaNombrePrecio = []
+    
+    # Metemos dentro de una lista unos strings para mostrar el menú
+    for elemento in menuDeLaCafe:
+        texto = f"{elemento.nombre} - ${elemento.precioBase:.2f}"
+        listaNombrePrecio.append(texto)
+        
     #Primero lo primero, crear un pedido a nombre de la persona
     pedido = Pedido(client)
     
+    while True:
+        idProductoSeleccionado = pedirOpcion(listaNombrePrecio)
+        
+        if isinstance(menuDeLaCafe[idProductoSeleccionado - 1], Bebida):
+            menuDeLaCafe[idProductoSeleccionado - 1].modificadores = [] #Vaciamos los posibles modificadores anteriories 
+            bebidaCopia = menuDeLaCafe[idProductoSeleccionado - 1]
+            producto = pedirExtras(bebidaCopia)
+        else:
+            producto = menuDeLaCafe[idProductoSeleccionado - 1]
+
+        if not pedido.validarStock(inventarioCafeteria):
+            print("No hay suficiente stock para completar su pedido.")
+            return
+        else:
+            pedido.agregarProducto(producto)
+        
+        continuar = int(input("\nDesea añadir algo más a la cuenta? (1. Si, 2 No): "))
+        if(continuar != 1): break
+    
+    if client.puntosFidelidad >= 10:
+        usarPuntos = int(input(f"Usted tiene {client.puntosFidelidad} puntos, ¿Desea canjearlos? (1. Si, 2. No): "))
+        if usarPuntos == 1:
+            cantidadPuntos = pedirInt("Ingrese la cantidad de puntos (10pts -> $10 de descuento)", 10, client.puntosFidelidad)
+            descuento = client.canjearPuntos(cantidadPuntos)
+        else:
+            descuento = 0.0
+    
+    pedido.calcularTotal(descuento)
+    
+    print("\n---- Resumen de la cuenta ----")
+    pedido.imprimirPedido()
+    
+    client.historialPedidos.append(pedido)
+    listaPedidos.append(pedido)
+    print("\nGracias por su compra! \n")  
     
 def verPedidosRealizados(cliente: Cliente):
     print(f"---- Pedidos realizados de {cliente.nombre} ----")
@@ -190,6 +251,7 @@ def verClientesRegistrados():
     for cliente in listaClientes:
         print(cliente)
 
+#Funciones generales de menús e inicio de sesión
 def login():
     usuario = None
     print("---- INICIO DE SESIÓN ----")
@@ -231,7 +293,7 @@ def mostrarMenuCliente(cliente: Cliente):
         ])
         
         match op:
-            case 1: realizarPedido()
+            case 1: realizarPedido(cliente)
             case 2: verPedidosRealizados(cliente)
             case _:
                 break

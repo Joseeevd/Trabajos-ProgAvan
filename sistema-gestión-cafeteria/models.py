@@ -64,7 +64,7 @@ class Cliente(Persona):
             return 0.0
         else:
             self.puntosFidelidad -= cantidadPuntos
-            descuento = (cantidadPuntos // 10) * 1.0
+            descuento = (cantidadPuntos // 10) * 10.0
             print(f"Puntos canjeados: {cantidadPuntos}, descuento al total: ${descuento:.2f}")
             return descuento
             
@@ -121,20 +121,33 @@ class Bebida(ProductoBase):
         else:
             print(f"El extra no se reconoce o no esta disponible.")
             
-
     def calcularPrecioFinal(self):
         totalExtras = sum(self.precioExtras.get(modificador, 0) for modificador in self.modificadores)
         return self.precioBase + totalExtras
+    
+    def descripcion(self):
+        extras = ", ".join(self.modificadores) if self.modificadores else "ninguno"
+        return (f"Bebida: {self.nombre} | {self.tamano} | {self.temperatura.value} "f"| Extras: {extras} | ${self.calcularPrecioFinal():.2f}")
     
 class Postre(ProductoBase):
     
     def __init__(self, nombre: str, precioBase: float, esVegano: bool, sinGluten: bool, ingredientes: list[str]):
         super().__init__(nombre, precioBase, ingredientes)
         self.esVegano = esVegano
-        self.sinGluten - sinGluten
+        self.sinGluten = sinGluten
         
     def __str__(self):
         return f"ID: {self.idProducto}, Nombre: {self.nombre}, Precio base: ${self.precioBase}, Es vegano: {self.esVegano}, Sin gluten: {self.sinGluten}"
+    
+    def calcularPrecioFinal(self):
+        return self.precioBase
+    
+    def descripcion(self):
+        tags = []
+        if self.esVegano: tags.append("Vegano")
+        if self.sinGluten: tags.append("Sin Gluten")
+        etiquetas = " | ".join(tags) if tags else "Estándar"
+        return f"Postre: {self.nombre} | {etiquetas} | ${self.precioBase:.2f}"
 
 
 # Log[i]stica y ventas
@@ -152,13 +165,13 @@ class Pedido:
         self.total = 0
     
     def imprimirPedido(self):
-        print(f"\n  ── Pedido #{self.idPedido}")
-        print(f"  Cliente : {self.cliente.nombre}")
-        print(f"  Estado  : {self.estado.value}")
-        print("  Productos:")
+        print(f"\n~ ~ ~ Pedido #{self.idPedido} ~ ~ ~")
+        print(f"Cliente: {self.cliente.nombre}")
+        print(f"Estado: {self.estado.value}")
+        print("Productos:")
         for p in self.productos:
-            print(f"    • {p.descripcion()}")
-        print(f"  Total   : ${self.total:.2f}")
+            print(f"{p.descripcion()}")
+        print(f"Total: ${self.total:.2f}")
       
     def agregarProducto(self, producto: ProductoBase):
         self.productos.append(producto)
@@ -184,13 +197,13 @@ class Inventario:
     def __init__(self, ingredientes: dict[str, int]):
         self.ingredientes = ingredientes
         
-    def reducirStock(self, ingrediente: str, cantidad: int) ->bool:
+    def reducirStock(self, ingrediente: str, cantidad: int) -> bool:
         stockIngrediente = self.ingredientes.get(ingrediente, 0)
         if stockIngrediente < cantidad:
             print(f"El stock actual de {ingrediente} ({stockIngrediente}) no es suficiente para satisfacer esta acción")
             return False
         else:
-            print(f"Se ha reducido {cantidad} al stock de ///")
+            print(f"Se ha reducido {cantidad} al stock de {ingrediente}")
             return True
         
     def notificarFaltante(self, ingrediente: str):
