@@ -74,6 +74,9 @@ class Empleado(Persona):
         super().__init__(nombre, email, contrasena)
         self.rol = rol # BARISTA, MESERO, GERENTE
         
+    def __str__(self):
+        return f"ID: {self.idPersona} - {self.nombre}, email:{self.email}, Rol: {self.rol.value}"
+        
     def actualizarInventario(self, inventario: Inventario, ingrediente: str, cantidad: int):
         inventario.ingredientes[ingrediente] = inventario.ingredientes.get(ingrediente, 0) + cantidad
         print(f"Se ha actualizado el stock de {ingrediente}, cantidad actual: {inventario.ingredientes[ingrediente]} unidades")

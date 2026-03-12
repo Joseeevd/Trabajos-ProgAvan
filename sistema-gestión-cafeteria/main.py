@@ -12,6 +12,9 @@ listaClientes = [
     Cliente("Diego Fernández", "d.fer@email.com", "df_2026_x", 0),
     Cliente("Sofía Castro", "sofia.castro@email.com", "sofi_vip", 2100)
 ]
+print(f"\n\n Listado de clientes")
+for c in listaClientes:
+    print(c)
 
 listaEmpleados = [
     Empleado("Jose el gerente", "jose@cafe.com", "1234", Rol.GERENTE),
@@ -25,6 +28,9 @@ listaEmpleados = [
     Empleado("Javier Torres", "javier.torres@cafe.com", "JaviM3#", Rol.MESERO),
     Empleado("Elena Castro", "elena.castro@cafe.com", "ElenM4*", Rol.MESERO)
 ]
+print(f"\n\n Listado de empleados")
+for e in listaEmpleados:
+    print(e)
 
 listaPedidos = [
     Pedido(listaClientes[0]),
@@ -38,7 +44,9 @@ listaPedidos = [
     Pedido(listaClientes[8]),
     Pedido(listaClientes[9]),
 ]
-
+print(f"\n\n Listado de pedidos")
+for ped in listaPedidos:
+    ped.imprimirPedido()
 
 listaBebidas = [
     Bebida("Americano", 35.0, "Mediano", Temperatura.CALIENTE, ["Café"]),
@@ -52,6 +60,9 @@ listaBebidas = [
     Bebida("Malteada de Fresa", 75, "Mediano", Temperatura.FRIA, ["Leche", "Helado Fresa"]),
     Bebida("Malteada de Chocolate", 75, "Mediano", Temperatura.FRIA, ["Leche", "Helado Chocolate"])
 ]
+print(f"\n\n Listado de bebidas")
+for bebida in listaBebidas:
+    print(bebida.descripcion())
 
 listaPostres = [
     Postre("Pastel de Chocolate Clásico", 150.0, False, False, ["Harina", "Huevo", "Azúcar", "Chocolate líquido"]),
@@ -65,6 +76,10 @@ listaPostres = [
     Postre("Crepas con Chocolate Líquido", 50.0, False, False, ["Harina", "Leche", "Chocolate líquido"]),
     Postre("Dulce de Leche Artesanal (Frasco)", 120.0, False, True, ["Leche", "Azúcar", "Vainilla"])
 ]
+print(f"\n\n Listado de postres")
+for postre in listaPostres:
+    print(postre.descripcion())
+
 # En lugar de hacer 10 inventarios, metemos 10 elementos a un solo inventario (Para mantener la coherencia)
 inventarioCafeteria = Inventario({
     "Leche" : 100,
@@ -82,6 +97,9 @@ inventarioCafeteria = Inventario({
     "Galletas": 100,
     "Mantequilla": 20
 })
+print(f"\n\n Listado de elementos en el inventario")
+for elemento in inventarioCafeteria.ingredientes:
+    print(f"{elemento} -> cantidad: {inventarioCafeteria.ingredientes.get(elemento, 0)}")
 
 # Esta ocasion usaremos diccionarios para hacer un listado donde NO SE PUEDAN REPETIR LOS EMAILS que se ingresen.
 dictEmpleados = {}
@@ -322,7 +340,7 @@ def mostrarMenuEmpleado(empleado: Empleado):
 
 
 # Código principal
-print("SISTEMA DE GESTION DE CAFETERIAS")
+print("\n\n\n - - - - SISTEMA DE GESTION DE CAFETERIAS - - - - ")
 while True:
     print("\n----------------------------------------------")
     op = pedirOpcion([
