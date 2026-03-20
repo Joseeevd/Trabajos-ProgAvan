@@ -15,6 +15,13 @@ class Usuario(Persona):
         self.limitePrestamos = limitePrestamos
         self.listaActiva = [] #Prestamos
         self.bloqueado = False
+        self.multasActivas = []
+    
+    def __str__(self):
+        return f"{self.nombre}"
+    
+    def mostrarInfo(self):
+        return f"[{self.id}] -> {self.nombre}, teléfono: {self.telefono}, Límite de préstamos: {self.limitePrestamos}, Bloqueado: {self.bloqueado}"
         
     def devolverMaterial(self, mat: Material):
         if mat in self.listaActiva:
@@ -31,29 +38,38 @@ class Bibliotecario(Persona):
     def __init__(self, nombre: str, telefono: str):
         super().__init__(nombre, telefono)
         
+    def __str__(self):
+        return f"{self.nombre}"
+        
+    def mostrarInfo(self):
+        return f"[{self.id}] -> {self.nombre}, teléfono: {self.telefono}"
+        
     def gestionarPrestamo(self, fechaInicio: datetime, fechaDevolucion: datetime, user: Usuario, material: Material):
         
         if not material.disponible:
             print("El material no se encuentra disponible")
-            return False
+            return 
         if len(user.listaActiva) == user.limitePrestamos:
             print("El usuario ya alcanzó su límite de prestamos")
-            return False
+            return 
         
         if fechaDevolucion < fechaInicio:
             print("La fecha de devolución es menor a la fecha de inicio. VUelva a ingresar los datos.")
-            return False
+            return 
         
         if  user.bloqueado:
             print(f"El usuario {user.nombre} tiene prohibido solicitar material de la biblioteca. \nLlame a la policía inmediatamente.")
-            return False
+            return 
         
-        Prestamo(fechaInicio, fechaDevolucion, user, material)
-        user.listaActiva.append(Prestamo)
-        return True
+        pres = Prestamo(fechaInicio, fechaDevolucion, user, material)
+        #user.listaActiva.append(material)
+        #print(user.listaActiva)
+        return pres
 
-    def transferirMaterial(self, material, sucursalDestino):
-        print(f"El material '{material}' se a transferido a la sucursal {sucursalDestino}")
+    def transferirMaterial(self, material: Material, sucursalActual: Sucursal, sucursalDestino: Sucursal):
+        sucursalActual.retirarMaterialCatalogoLocal(material)
+        sucursalDestino.agregarMaterialACatalogoLocal(material)
+        print(f"El material '{material.titulo}' se a transferido de {sucursalActual.nombre} a {sucursalDestino.nombre}")
 
 class Sucursal:
     _contadorSucursal = 1
@@ -63,16 +79,68 @@ class Sucursal:
         self.nombre = nombre
         self.catalogoLocal = []
         
+        Catalogo.listadoMaterial[self] = []
+        
+    def __str__(self):
+        return f"{self.nombre} -> Material en el catálogo: {len(self.catalogoLocal)} ejemplares"
+        
+    def agregarMaterialACatalogoLocal(self, material: Material):
+        self.catalogoLocal.append(material)
+        Catalogo.listadoMaterial[self] = self.catalogoLocal
+        
+    def retirarMaterialCatalogoLocal(self, material: Material):
+        self.catalogoLocal.remove(material)
+        Catalogo.listadoMaterial[self] = self.catalogoLocal
+        
     
 class Catalogo:
-    listadoMaterial = []
+    
+    # Sucursal : List[Material]
+    listadoMaterial = {}
     
     @classmethod
-    def buscarPorAutor(self, autor: str):
-        print("buscando....")
+    def imprimirListadoMaterial(cls):
 
-    def buscarEnTodasLasSucursales(self, titulo: str):
+        if cls.listadoMaterial:            
+            for sucursal, listaMateriales in cls.listadoMaterial.items():
+                titulosMat = ""
+                print(f"\nSucursal: {sucursal}")
+                
+                if listaMateriales:
+                    for mat in listaMateriales:
+                       titulosMat += mat.titulo
+                       if not mat == listaMateriales[-1]:
+                            titulosMat += ", "
+                else:
+                    titulosMat = "Sin existencia"
+                
+                print(f"Material: {titulosMat}")
+    
+    @classmethod
+    def buscarPorAutor(cls, autorBuscado: str, lista: list[Libro]):
+        res = []
+        
         print("Buscando....")
+        for libro in lista:
+            if libro.autor == autorBuscado:
+                res.append(libro)        
+        
+        return res
+        
+
+    @classmethod
+    def buscarEnTodasLasSucursales(cls, titulo: str):
+        print("Buscando....")
+            
+        for sucursal, listaMateriales in cls.listadoMaterial.items():  
+            #print(f"\n{sucursal}")
+            for mat in listaMateriales:
+                #print(mat.titulo)
+                if titulo == mat.titulo: 
+                    print(f"El material '{mat.titulo}' ha sido encontrado en la sucursal {sucursal.nombre}")
+                    return
+                
+        print("El material no se ha encontrado.")
 
 
 
@@ -86,7 +154,7 @@ class Material:
         self.añoPublicacion = añoPublicacion
         self.disponible = True
         
-        Catalogo.listadoMaterial.append(self)
+        #Catalogo.listadoMaterial.append(self)
         
 class Libro(Material):
     def __init__(self, titulo: str, añoPublicacion: int, autor: str, isbn: str, genero: str):
@@ -128,6 +196,7 @@ class Prestamo:
         self.material = material
         
         self.material.disponible = False
+        self.usuario.listaActiva.append(self.material) #añadimos el material a la lista activa del usuario al crear un préstamo
         
     def __str__(self):
         return f"[{self.idPrestamo}] - F. Inicio: {self.fechaInicio}, F. Devolución: {self.fechaDevolucion}, Usuario: {self.usuario.nombre}, Material: {self.material.titulo}"
@@ -139,18 +208,27 @@ class Penalizacion:
         self.motivo = motivo
         self.pagada = False
         
+    def __str__(self):
+        return f"Penalización -> Motivo: {self.motivo}, Monto a pagar: ${self.monto:.2f}, Pagada: {self.pagada}"
+        
     def calcularMulta(self, prestamo: Prestamo):
-        cantidadDias = prestamo.fechaDevolucion - prestamo.fechaInicio
+        diferencia = prestamo.fechaDevolucion - prestamo.fechaInicio
+        cantidadDias = diferencia.days
         
         if cantidadDias < 0:
-            print("El préstamo sigue activo")
+            print("Gracias por devolver el material a tiempo!")
         if 1 <= cantidadDias <= 3:
             print(f"Se le ha multado con $30 por no entregar el libro en {cantidadDias} días.")
+            self.monto = 30.0
+            prestamo.usuario.multasActivas.append(self)
         elif 4 <= cantidadDias <= 7:
             print(f"Se le ha multado con $100 por no entregar el libro en {cantidadDias} días.")
+            self.monto = 100.0
+            prestamo.usuario.multasActivas.append(self)
         
     def pagarMulta(self):
         self.pagada = True
+        print(f"Por favor, pague el monto de ${self.monto:.2f} MXN")
     
     def bloquearUsuario(self, user: Usuario):
         user.bloquedo = True
