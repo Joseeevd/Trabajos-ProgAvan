@@ -32,7 +32,7 @@ listaUsuarios = [
 listaUsuarios[3].bloqueado = True # alerta alerta deudor deudor llame a la polecia
 
 print("\nLista de usuarios")
-for obj in listaUsuarios: print(obj)
+for obj in listaUsuarios: print(obj.mostrarInfo())
 
 listaBibliotecarios = [
     Bibliotecario("Esteban", "12939813"),
@@ -47,7 +47,7 @@ listaBibliotecarios = [
     Bibliotecario("Charlie", "723479")
 ]
 print("\nLista de bibliotecarios")
-for obj in listaBibliotecarios: print(obj)
+for obj in listaBibliotecarios: print(obj.mostrarInfo())
 
 listaLibros = [
     # Gabriel García Márquez
@@ -153,7 +153,19 @@ listaSucursales[3].agregarMaterialACatalogoLocal(listaLibros[7])
 listaSucursales[3].agregarMaterialACatalogoLocal(listaLibros[8])
 listaSucursales[4].agregarMaterialACatalogoLocal(listaLibros[9])
 listaSucursales[4].agregarMaterialACatalogoLocal(listaRevistas[0])
+listaSucursales[5].agregarMaterialACatalogoLocal(listaRevistas[2])
+listaSucursales[5].agregarMaterialACatalogoLocal(listaRevistas[3])
+listaSucursales[6].agregarMaterialACatalogoLocal(listaRevistas[4])
+listaSucursales[6].agregarMaterialACatalogoLocal(listaRevistas[5])
+listaSucursales[7].agregarMaterialACatalogoLocal(listaRevistas[6])
+listaSucursales[7].agregarMaterialACatalogoLocal(listaRevistas[7])
+listaSucursales[8].agregarMaterialACatalogoLocal(listaRevistas[8])
+listaSucursales[8].agregarMaterialACatalogoLocal(listaRevistas[9])
+listaSucursales[9].agregarMaterialACatalogoLocal(listaMatDigital[0])
+listaSucursales[9].agregarMaterialACatalogoLocal(listaMatDigital[1])
 
+print("\nLista de sucursales")
+for obj in listaSucursales: print(obj)
 
 
 def pedirInt(mensaje: str, valorMinimo: int=0, valorMaximo: int = 9999) -> int:
